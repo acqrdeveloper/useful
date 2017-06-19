@@ -6,15 +6,16 @@
  * Time: 09:13
  */
 
-namespace SF\Http\Controllers;
+namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\Facades\Image;
 use PHPExcel_IOFactory;
 use PHPExcel_Style_Alignment;
+use PHPExcel_Style_Border;
+use PHPExcel_Style_Fill;
 
 /**
  * variables constantes dinamicas
@@ -38,23 +39,23 @@ trait Useful
     /**
      * variables para PHPExcel
      */
-    public $textAlignHCenter = ['alignment' => ['horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_CENTER]];
-    public $textAlignVCenter = ['alignment' => ['horizontal' => \PHPExcel_Style_Alignment::VERTICAL_CENTER]];
-    public $textAlignHRight = ['alignment' => ['horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_RIGHT]];
-    public $textAlignHLeft = ['alignment' => ['horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_LEFT]];
-    public $borderAllBordersTHIN = ['borders' => ['allborders' => ['style' => \PHPExcel_Style_Border::BORDER_THIN]]];
-    public $borderOutlineTHIN = ['borders' => ['outline' => ['style' => \PHPExcel_Style_Border::BORDER_THIN]]];
-    public $colorFillBlueSOLID = ['fill' => ['type' => \PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => '2196F3']]];
-    public $colorFillGreenSOLID = ['fill' => ['type' => \PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => '4caf50']]];
-    public $colorFillTealSOLID = ['fill' => ['type' => \PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => '009688']]];
-    public $colorFillGreySOLID = ['fill' => ['type' => \PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => '9e9e9e']]];
-    public $colorFillBlueGreySOLID = ['fill' => ['type' => \PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => '607d8b']]];
-    public $colorFillYellowSOLID = ['fill' => ['type' => \PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => 'ffeb3b']]];
-    public $colorFillAmberSOLID = ['fill' => ['type' => \PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => 'ffc107']]];
-    public $colorFillOrangeSOLID = ['fill' => ['type' => \PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => 'ff9800']]];
-    public $colorFillIndigoSOLID = ['fill' => ['type' => \PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => '3f51b5']]];
-    public $colorFillRedSOLID = ['fill' => ['type' => \PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => 'f44336']]];
-    public $colorFillNoneSOLID = ['fill' => ['type' => \PHPExcel_Style_Fill::FILL_NONE]];
+    public $textAlignHCenter = ['alignment' => ['horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER]];
+    public $textAlignVCenter = ['alignment' => ['horizontal' => PHPExcel_Style_Alignment::VERTICAL_CENTER]];
+    public $textAlignHRight = ['alignment' => ['horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT]];
+    public $textAlignHLeft = ['alignment' => ['horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT]];
+    public $borderAllBordersTHIN = ['borders' => ['allborders' => ['style' => PHPExcel_Style_Border::BORDER_THIN]]];
+    public $borderOutlineTHIN = ['borders' => ['outline' => ['style' => PHPExcel_Style_Border::BORDER_THIN]]];
+    public $colorFillBlueSOLID = ['fill' => ['type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => '2196F3']]];
+    public $colorFillGreenSOLID = ['fill' => ['type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => '4caf50']]];
+    public $colorFillTealSOLID = ['fill' => ['type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => '009688']]];
+    public $colorFillGreySOLID = ['fill' => ['type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => '9e9e9e']]];
+    public $colorFillBlueGreySOLID = ['fill' => ['type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => '607d8b']]];
+    public $colorFillYellowSOLID = ['fill' => ['type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => 'ffeb3b']]];
+    public $colorFillAmberSOLID = ['fill' => ['type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => 'ffc107']]];
+    public $colorFillOrangeSOLID = ['fill' => ['type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => 'ff9800']]];
+    public $colorFillIndigoSOLID = ['fill' => ['type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => '3f51b5']]];
+    public $colorFillRedSOLID = ['fill' => ['type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => 'f44336']]];
+    public $colorFillNoneSOLID = ['fill' => ['type' => PHPExcel_Style_Fill::FILL_NONE]];
     public $textDefaultBOLD = ['font' => ['bold' => true, 'color' => ['rgb' => '000000']]];
     public $textWhiteBOLD = ['font' => ['bold' => true, 'color' => ['rgb' => 'ffffff']]];
     public $textWhite = ['font' => ['bold' => false, 'color' => ['rgb' => 'ffffff']]];
