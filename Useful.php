@@ -55,7 +55,7 @@ trait Useful
     public $colorFillIndigoSOLID = ['fill' => ['type' => \PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => '3f51b5']]];
     public $colorFillRedSOLID = ['fill' => ['type' => \PHPExcel_Style_Fill::FILL_SOLID, 'color' => ['rgb' => 'f44336']]];
     public $colorFillNoneSOLID = ['fill' => ['type' => \PHPExcel_Style_Fill::FILL_NONE]];
-    public $textBlackBOLD = ['font' => ['bold' => true, 'color' => ['rgb' => '000000']]];
+    public $textDefaultBOLD = ['font' => ['bold' => true, 'color' => ['rgb' => '000000']]];
     public $textWhiteBOLD = ['font' => ['bold' => true, 'color' => ['rgb' => 'ffffff']]];
     public $textWhite = ['font' => ['bold' => false, 'color' => ['rgb' => 'ffffff']]];
     public $textBlack = ['font' => ['bold' => false, 'color' => ['rgb' => '000000']]];
@@ -67,54 +67,59 @@ trait Useful
      * @param string $title
      * @param string $level
      */
-    function fnException($exception, $title = 'advertencia', $level = 'warning')
+    function fnException($exception = null, $title = 'advertencia', $level = 'warning')
     {
-        if ($exception->getCode() > 0) {
-            if (Auth::user()->id == 1) {
-                if (!is_null($exception)) {
-                    $this->rpta = ['load' => false, 'data' => null, 'error' => null, 'detail' => 'hubo un problema, contácte al area de sistemas.', 'title' => $title, 'level' => $level];
-                }
-            } else {
-                if (!is_null($exception)) {
-                    $this->rpta = ['load' => false, 'data' => null, 'error' => $exception->getFile() . ' | ' . $exception->getLine() . ' | ' . $exception->getMessage(), 'detail' => $exception->getPrevious()->errorInfo[2], 'title' => $title, 'level' => $level];
-                }
-            }
-        } else {
-            if (!is_null($exception)) {
-                $this->rpta = ['load' => false, 'data' => null, 'error' => $exception->getFile() . ' | ' . $exception->getLine() . ' | ' . $exception->getMessage(), 'detail' => $exception->getMessage(), 'title' => $title, 'level' => $level];
+        if (!is_null($exception)) {
+            if ($exception->getCode() > 0) {// PDOException
+                $this->rpta = ['load' => false, 'data' => null, 'message' => $exception->getPrevious()->errorInfo[2], 'title' => $title, 'level' => $level];
+            } else {// Exception
+                $this->rpta = ['load' => false, 'data' => null, 'message' => $exception->getMessage(), 'title' => $title, 'level' => $level];
             }
         }
     }
 
     /**
+     * metodo generico que ingresa en la respuesta generica para notificar mensaje personalizado de Error
+     * @param $error
+     * @param string $title
+     * @param string $message
+     * @param string $level
+     */
+    function fnError($error = null, $title = 'ERROR', $message = 'contácte al administrador', $level = 'warning')
+    {
+        if (!is_null($error)) {
+            $this->rpta = ['load' => false, 'data' => null, 'detail' => $error, 'title' => $title, 'message' => $message, 'level' => $level];
+        }
+    }
+
+    /**
      * metodo generico que realiza la respuesta generica de satisfaccion
-     * @param $detail
+     * @param string $message
      * @param null $data
      * @param string $title
      * @param string $level
      */
-    function fnSuccess($detail, $data = null, $title = 'bien', $level = 'success')
+    function fnSuccess($message = 'ejecutado correctamente', $data = null, $title = 'BIEN', $level = 'success')
     {
-        $this->rpta = ['load' => true, 'data' => $data, 'detail' => $detail, 'title' => $title, 'level' => $level];
+        $this->rpta = ['load' => true, 'data' => $data, 'title' => $title, 'message' => $message, 'level' => $level];
     }
 
     /**
      * metodo generico para las notificaciones a la vista.
      *
      * @param string $title
-     * @param null $detail
+     * @param string $message
      * @param  string $level
      * @return \Laracasts\Flash\FlashNotifier
      */
-    function fnFlashMessage($title = 'bien', $detail = null, $level = 'success')
+    function fnFlashMessage($title = 'bien', $message = 'ejecutado correctamente', $level = 'success')
     {
-        $arr_message = ['title' => $title, 'detail' => $detail];
+        $arr_message = ['title' => $title, 'message' => $message];
         $notifier = app('flash');
 
-        if (!is_null($detail)) {
-            return $notifier->message($arr_message, $level);
+        if (!is_null($message)) {
+            $notifier->message($arr_message, $level);
         }
-
         return $notifier;
     }
 
@@ -144,12 +149,12 @@ trait Useful
     /**
      * metodo generico que devuelve el maximo ID de una tabla y su AUTOINCREMENT
      * @param $table
-     * @param null $field
+     * @param string $field
      * @return int
      */
-    function fnGetMaxID($table, $field = null)
+    function fnGetMaxID($table, $field = 'id')
     {
-        $maxID = DB::table($table)->max(($field == null) ? 'id' : $field);
+        $maxID = DB::table($table)->max($field);
         return (int)$maxID + 1;
     }
 
@@ -198,15 +203,7 @@ trait Useful
 
         // Dejar estatico solo la primera fila
         $worksheet->freezePane('A' . ($row + 1));
-        $styleArray = array(
-            'font' => array(
-                'bold' => true
-            ),
-            'alignment' => array(
-                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER
-            )
-        );
-        $worksheet->getStyle($columns[0] . $row . ':' . $oneColumn . $row)->applyFromArray($styleArray);
+        $worksheet->getStyle($columns[0] . $row . ':' . $oneColumn . $row)->applyFromArray(array($this->textDefaultBOLD, $this->textAlignHCenter));
         return $worksheet;
     }
 
@@ -317,10 +314,10 @@ trait Useful
      * @param $path
      * @param $request
      */
-    protected function fnSaveImage($path,$request)
+    protected function fnSaveImage($path, $request)
     {
         $image = Image::make($request);
-        $image->save($path.$request->getClientOriginalName());
+        $image->save($path . $request->getClientOriginalName());
     }
 
 }
